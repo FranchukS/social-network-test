@@ -1,8 +1,21 @@
-from django.conf import settings
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from post.models import Post, Like
+
+
+class ActiveLikeSerializer(serializers.ListSerializer):
+    """ Filter so only active likes are shown """
+    def to_representation(self, data):
+        data = data.filter(is_active=True)
+        return super(ActiveLikeSerializer, self).to_representation(data)
+
+
+class LikeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Like
+        list_serializer_class = ActiveLikeSerializer
+        fields = ("user",)
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -19,28 +32,16 @@ class PostListSerializer(serializers.ModelSerializer):
 
 
 class PostDetailSerializer(serializers.ModelSerializer):
-    liked_by = serializers.SlugRelatedField(many=True, slug_field="username", read_only=True,)
+    likes = LikeSerializer(many=True)
 
     class Meta:
         model = Post
-        fields = ("id", "title", "owner", "created_at", "content", "liked_by")
+        fields = ("id", "title", "owner", "created_at", "content", "likes")
 
 
 class PostLikeSerializer(serializers.ModelSerializer):
-    liked_by = serializers.SlugRelatedField(
-        queryset=get_user_model().objects.filter(likes__is_active=True),
-        many=True, slug_field="username",
-        # read_only=True,
-    )
+    likes = LikeSerializer(many=True)
 
     class Meta:
         model = Post
-        fields = ("likes_number", "liked_by")
-
-
-# class LikeSerializer(serializers.ModelSerializer):
-#     liked_by = serializers.SlugRelatedField(many=True, slug_field="username", read_only=True,)
-#
-#     class Meta:
-#         model = Like
-#         fields = ("liked_by",)
+        fields = ("likes_number", "likes")
