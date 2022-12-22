@@ -29,6 +29,13 @@ class Post(BaseBlogModel):
     class Meta:
         ordering = ("created_at",)
 
+    @property
+    def likes_number(self):
+        return self.likes.count()
+
+    def __str__(self):
+        return self.title
+
 
 class Like(BaseBlogModel):
     post = models.ForeignKey(Post, related_name="likes", on_delete=models.CASCADE)
