@@ -1,6 +1,7 @@
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-import blog.settings
 from post.models import Post, Like
 
 
@@ -24,7 +25,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
 
 
 class LikeSerializer(serializers.ModelSerializer):
-    liked_by = serializers.SlugRelatedField(blog.settings.AUTH_USER_MODEL.username)
+    liked_by = serializers.SlugRelatedField(many=True, slug_field="username", read_only=True)
 
     class Meta:
         model = Like
