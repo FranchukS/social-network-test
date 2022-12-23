@@ -48,7 +48,7 @@ class PostViewSet(viewsets.ModelViewSet):
         """Endpoint for like/unlike specific post by user"""
         user = self.request.user
         post = self.get_object()
-        serializer = self.get_serializer_class()(post)
+        serializer = self.get_serializer(post)
 
         # check if user already liked post
         if user in post.liked_by.all():
