@@ -18,3 +18,24 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
 class ListUserView(generics.ListAPIView):
     queryset = get_user_model().objects.all()
     serializer_class = UserActivitySerializer
+
+    @staticmethod
+    def _params_to_ints(qs):
+        """Converts a list of string IDs to a list of integers"""
+        return [int(str_id) for str_id in qs.split(",")]
+
+    def get_queryset(self):
+        """Retrieve the user with filter"""
+        user_ids = self.request.query_params.get("user_id")
+        username = self.request.query_params.get("username")
+
+        queryset = get_user_model().objects.all()
+        print(queryset)
+        if user_ids:
+            user_ids = self._params_to_ints(user_ids)
+            queryset = queryset.filter(id__in=user_ids)
+
+        if username:
+            queryset = queryset.filter(username__icontains=username)
+
+        return queryset
