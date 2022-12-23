@@ -1,6 +1,7 @@
+from django.contrib.auth import get_user_model
 from rest_framework import generics
 
-from user.serializers import UserSerializer
+from user.serializers import UserSerializer, UserActivitySerializer
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -12,3 +13,8 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class ListUserView(generics.ListAPIView):
+    queryset = get_user_model().objects.all()
+    serializer_class = UserActivitySerializer
