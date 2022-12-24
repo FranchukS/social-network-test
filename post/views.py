@@ -1,6 +1,11 @@
+import datetime
+
+from django.db.models import Count
+from django.db.models.functions import TruncDay
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from post.models import Post, Like
 from post.serializers import (
@@ -59,3 +64,50 @@ class PostViewSet(viewsets.ModelViewSet):
 
         Like.objects.create(post=post, user=user)
         return Response(status=status.HTTP_201_CREATED, data=serializer.data)
+
+
+class PostLikeAnalytics(APIView):
+
+    @staticmethod
+    def validate_date_param(date_from, date_to):
+        if date_from:
+            try:
+                date_from = datetime.datetime.strptime(date_from, '%Y-%m-%d').date()
+
+                if date_to:
+                    date_to = datetime.datetime.strptime(date_to, '%Y-%m-%d').date()
+                else:
+                    date_to = datetime.datetime.now()
+            except ValueError:
+                return False, False
+            return date_from, date_to
+
+    def get(self, request):
+        data = {}
+        date_from = request.query_params.get("date_from")
+        date_to = request.query_params.get("date_to")
+
+        date_from, date_to = self.validate_date_param(date_from, date_to)
+        print(date_to)
+        if not any([date_from, date_to]):
+
+            data["message"] = "You entered an incorrect date format."
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+        likes = (
+            Like.objects
+            .annotate(date=TruncDay("updated_at"))
+            .values("date")
+            .annotate(quantity=Count("id"))
+            .values("date", "quantity")
+            .filter(is_active=True, updated_at__range=(date_from, date_to))
+        )
+        if likes:
+            for like in likes:
+                date = like["date"].strftime("%Y-%m-%d")
+                data[date] = like["quantity"]
+
+            return Response(data, status=status.HTTP_200_OK)
+
+        data["message"] = "No likes for this period."
+        return Response(data, status=status.HTTP_404_NOT_FOUND)
