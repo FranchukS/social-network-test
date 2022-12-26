@@ -30,7 +30,6 @@ class ListUserView(generics.ListAPIView):
         username = self.request.query_params.get("username")
 
         queryset = get_user_model().objects.all()
-        print(queryset)
         if user_ids:
             user_ids = self._params_to_ints(user_ids)
             queryset = queryset.filter(id__in=user_ids)

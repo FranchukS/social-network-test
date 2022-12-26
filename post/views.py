@@ -80,7 +80,7 @@ class PostLikeAnalytics(APIView):
                     date_to = datetime.datetime.now()
             except ValueError:
                 return False, False
-            return date_from, date_to
+        return date_from, date_to
 
     def get(self, request):
         data = {}
