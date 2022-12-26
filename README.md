@@ -19,7 +19,7 @@ aggregated by day.
 mades a last request to the service.
 Requirements:
 * Implement token authentication (JWT is prefered)
-
+]
 ### Notes:
 * ​Clean and usable REST API is important
 * the project is not defined in detail, the candidate should use their best judgment for every

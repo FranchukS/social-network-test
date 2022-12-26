@@ -16,8 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from post.views import PostLikeAnalytics
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/user/", include("user.urls", namespace="user")),
-    path("api/post/", include("post.urls", namespace="post"))
+    path("api/post/", include("post.urls", namespace="post")),
+    path("api/analytics/", PostLikeAnalytics.as_view(), name="analytics")
 ]
