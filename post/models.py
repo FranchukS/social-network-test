@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.db.models import Count
 
 
 class BaseBlogModel(models.Model):
@@ -31,7 +32,8 @@ class Post(BaseBlogModel):
 
     @property
     def likes_number(self):
-        return self.likes.filter(is_active=True).count()
+        # return self.likes.filter(is_active=True).count()
+        return self.likes.filter(is_active=True).aggregate(Count("id"))
 
     def __str__(self):
         return self.title
