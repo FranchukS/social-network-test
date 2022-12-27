@@ -4,6 +4,7 @@ from django.db.models import Count
 from django.db.models.functions import TruncDay
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -19,6 +20,7 @@ from post.serializers import (
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.filter(is_active=True)
     serializer_class = PostSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -67,6 +69,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class PostLikeAnalytics(APIView):
+    permission_classes = (IsAuthenticated,)
 
     @staticmethod
     def validate_date_param(date_from, date_to):
