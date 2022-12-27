@@ -1,15 +1,18 @@
 from django.contrib.auth import get_user_model
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from user.serializers import UserSerializer, UserActivitySerializer
 
 
 class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated,)
 
 
 class ManageUserView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_object(self):
         return self.request.user
@@ -18,6 +21,7 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
 class ListUserView(generics.ListAPIView):
     queryset = get_user_model().objects.all()
     serializer_class = UserActivitySerializer
+    permission_classes = (IsAdminUser,)
 
     @staticmethod
     def _params_to_ints(qs):
@@ -30,7 +34,6 @@ class ListUserView(generics.ListAPIView):
         username = self.request.query_params.get("username")
 
         queryset = get_user_model().objects.all()
-        print(queryset)
         if user_ids:
             user_ids = self._params_to_ints(user_ids)
             queryset = queryset.filter(id__in=user_ids)
